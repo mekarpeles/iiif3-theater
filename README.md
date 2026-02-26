@@ -2,6 +2,8 @@
 
 A web-based theater viewer for exploring and navigating high-resolution images from archive.org using IIIF (International Image Interoperability Framework) and OpenSeaDragon.
 
+<img width="2400" height="1186" alt="image" src="https://github.com/user-attachments/assets/6d3a0211-e256-4719-8513-ea7849132e65" />
+
 ## Features
 
 - **Combined Theater View**: Browse thumbnails while viewing images in OpenSeaDragon
