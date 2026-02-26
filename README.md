@@ -1,5 +1,21 @@
 # Archive.org IIIF Theater
 
+A web-based theater viewer for exploring and navigating high-resolution images from archive.org using IIIF (International Image Interoperability Framework) and OpenSeaDragon.
+
+## Features
+
+- **Combined Theater View**: Browse thumbnails while viewing images in OpenSeaDragon
+- **IIIF Integration**: Deep-zoom viewing via archive.org's IIIF 3.0 server
+- **Collapsible Thumbnail Strip**: Expand/collapse the thumbnail navigation panel
+- **Responsive Design**: Works in modern browsers with a dark theme
+
+## Quick Start
+
+1. Open `index.html` in a browser
+2. Enter an archive.org item identifier (e.g., `2025-highland-house-walkthrough-ma`)
+3. Browse thumbnails and click to view images in the OpenSeaDragon viewer
+4. Use the toggle handle to collapse/expand the thumbnail strip
+
 ## Overview
 
 This project implements a theater viewer for archive.org items using IIIF (International Image Interoperability Framework) and OpenSeaDragon for deep-zoom image viewing.
