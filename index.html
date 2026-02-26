@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archive.org IIIF Theater</title>
+  <script src="https://cdn.jsdelivr.net/npm/openseadragon@5.0.1/build/openseadragon/openseadragon.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    .header {
+      padding: 16px 24px;
+      background: #2a2a2a;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid #3a3a3a;
+    }
+
+    .header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .search-form {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .search-form input {
+      padding: 8px 12px;
+      border: 1px solid #4a4a4a;
+      border-radius: 4px;
+      background: #3a3a3a;
+      color: #fff;
+      font-size: 14px;
+      width: 280px;
+    }
+
+    .search-form input:focus {
+      outline: none;
+      border-color: #6a6a6a;
+    }
+
+    .search-form button {
+      padding: 8px 16px;
+      background: #4a90d9;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .search-form button:hover {
+      background: #5a9fe9;
+    }
+
+    #theater-view {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 65px);
+    }
+
+    .theater-title {
+      padding: 12px 24px;
+      font-size: 1rem;
+      color: #aaa;
+      background: #222;
+    }
+
+    .thumbnail-strip {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
+    }
+
+    .thumbnail-strip::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .thumbnail-strip::-webkit-scrollbar-track {
+      background: #2a2a2a;
+    }
+
+    .thumbnail-strip::-webkit-scrollbar-thumb {
+      background: #4a4a4a;
+      border-radius: 4px;
+    }
+
+    .thumbnail {
+      flex-shrink: 0;
+      width: 200px;
+      cursor: pointer;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      background: #2a2a2a;
+    }
+
+    .thumbnail:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .thumbnail img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumbnail-info {
+      padding: 8px;
+      font-size: 12px;
+      color: #aaa;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #viewer-view {
+      display: none;
+      flex-direction: column;
+      height: calc(100vh - 65px);
+    }
+
+    .viewer-toolbar {
+      padding: 12px 24px;
+      background: #2a2a2a;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid #3a3a3a;
+    }
+
+    .back-button {
+      padding: 8px 16px;
+      background: #4a4a4a;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .back-button:hover {
+      background: #5a5a5a;
+    }
+
+    .current-image {
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    #osd-container {
+      flex: 1;
+      background: #000;
+    }
+
+    .loading, .error, .empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      font-size: 16px;
+      color: #aaa;
+    }
+
+    .error {
+      color: #e55;
+    }
+
+    .loading::after {
+      content: '';
+      width: 24px;
+      height: 24px;
+      border: 3px solid #4a4a4a;
+      border-top-color: #4a90d9;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>IIIF Theater</h1>
+    <form class="search-form" id="search-form">
+      <input type="text" id="item-input" placeholder="Enter archive.org item identifier" value="2025-highland-house-walkthrough-ma">
+      <button type="submit">Load</button>
+    </form>
+  </div>
+
+  <div id="theater-view">
+    <div class="theater-title" id="theater-title">Select an item to view</div>
+    <div class="thumbnail-strip" id="thumbnail-strip">
+      <div class="empty">Enter an archive.org item identifier above to load images</div>
+    </div>
+  </div>
+
+  <div id="viewer-view">
+    <div class="viewer-toolbar">
+      <button class="back-button" id="back-button">← Back to Theater</button>
+      <span class="current-image" id="current-image"></span>
+    </div>
+    <div id="osd-container"></div>
+  </div>
+
+  <script>
+    const ARCHIVE_API = 'https://archive.org';
+    const IIIF_BASE = 'https://iiif.archive.org';
+    const IIIF_IMAGE_BASE = 'https://iiif.archive.org/image/iiif/3';
+
+    let viewer = null;
+    let currentItem = '';
+
+    const searchForm = document.getElementById('search-form');
+    const itemInput = document.getElementById('item-input');
+    const theaterView = document.getElementById('theater-view');
+    const viewerView = document.getElementById('viewer-view');
+    const thumbnailStrip = document.getElementById('thumbnail-strip');
+    const theaterTitle = document.getElementById('theater-title');
+    const currentImage = document.getElementById('current-image');
+    const backButton = document.getElementById('back-button');
+
+    function buildIIIFUrl(item, filename) {
+      if (filename) {
+        return `${IIIF_IMAGE_BASE}/${encodeURIComponent(item)}%2f${encodeURIComponent(filename)}/info.json`;
+      }
+      return `${IIIF_BASE}/iiif/img-${item}/info.json`;
+    }
+
+    function getThumbnailUrl(item, filename) {
+      return `${ARCHIVE_API}/download/${encodeURIComponent(item)}/${encodeURIComponent(filename)}`;
+    }
+
+    function filterImages(files) {
+      return files
+        .filter(f => f.name.endsWith('.jpg') && !f.name.includes('_thumb') && !f.name.includes('.thumbs/') && f.name !== '__ia_thumb.jpg')
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    async function fetchImages(item) {
+      const response = await fetch(`${ARCHIVE_API}/metadata/${item}/files`);
+      if (!response.ok) throw new Error('Failed to fetch item metadata');
+      const data = await response.json();
+      return filterImages(data.result);
+    }
+
+    function renderTheater(images) {
+      thumbnailStrip.innerHTML = '';
+      
+      if (images.length === 0) {
+        thumbnailStrip.innerHTML = '<div class="empty">No images found in this item</div>';
+        return;
+      }
+
+      images.forEach(file => {
+        const thumb = document.createElement('div');
+        thumb.className = 'thumbnail';
+        thumb.innerHTML = `
+          <img src="${getThumbnailUrl(currentItem, file.name)}" alt="${file.name}" loading="lazy">
+          <div class="thumbnail-info">${file.name}</div>
+        `;
+        thumb.addEventListener('click', () => openViewer(file.name));
+        thumbnailStrip.appendChild(thumb);
+      });
+    }
+
+    function showTheater() {
+      viewerView.style.display = 'none';
+      theaterView.style.display = 'flex';
+      if (viewer) {
+        viewer.destroy();
+        viewer = null;
+      }
+    }
+
+    function openViewer(filename) {
+      const iiifUrl = buildIIIFUrl(currentItem, filename);
+      currentImage.textContent = filename;
+      
+      theaterView.style.display = 'none';
+      viewerView.style.display = 'flex';
+
+      viewer = OpenSeadragon({
+        id: 'osd-container',
+        prefixUrl: 'https://cdn.jsdelivr.net/npm/openseadragon@5.0.1/build/openseadragon/images/',
+        tileSources: iiifUrl,
+        showNavigationControl: true,
+        animationTime: 0.5,
+        blendTime: 0.1,
+        constrainDuringPan: true,
+        maxZoomPixelRatio: 2,
+        minZoomImageRatio: 0.8,
+        visibilityRatio: 1,
+        zoomPerScroll: 2,
+        timeout: 120000,
+      });
+    }
+
+    async function loadItem(item) {
+      if (!item.trim()) return;
+      
+      currentItem = item.trim();
+      theaterTitle.textContent = `Loading ${currentItem}...`;
+      thumbnailStrip.innerHTML = '<div class="loading">Loading</div>';
+
+      try {
+        const images = await fetchImages(currentItem);
+        theaterTitle.textContent = `${currentItem} (${images.length} images)`;
+        renderTheater(images);
+      } catch (error) {
+        theaterTitle.textContent = 'Error';
+        thumbnailStrip.innerHTML = `<div class="error">${error.message}</div>`;
+      }
+    }
+
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      loadItem(itemInput.value);
+    });
+
+    backButton.addEventListener('click', showTheater);
+
+    // Load default item on page load
+    loadItem(itemInput.value);
+  </script>
+</body>
+</html>
