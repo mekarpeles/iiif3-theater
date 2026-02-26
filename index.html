@@ -237,7 +237,7 @@
     <div class="loading">Loading</div>
   </div>
 
-  <button class="toggle-thumbs" id="toggle-thumbs" title="Toggle thumbnails">▼</button>
+  <button class="toggle-thumbs" id="toggle-thumbs" title="Toggle thumbnails" style="display: none;">▼</button>
 
   <div class="thumbnail-strip" id="thumbnail-strip"></div>
 
@@ -345,21 +345,34 @@
 
       try {
         images = await fetchImages(currentItem);
+        if (images.length === 0) {
+          itemTitle.textContent = `${currentItem}`;
+          thumbnailStrip.innerHTML = '<div class="empty">No images found in this item</div>';
+          toggleThumbs.style.display = 'none';
+          return;
+        }
         itemTitle.textContent = `${currentItem} (${images.length} images)`;
+        toggleThumbs.style.display = 'flex';
         renderThumbnails();
         
         if (images.length > 0) {
           loadImageInViewer(images[0].name);
         }
       } catch (error) {
-        itemTitle.textContent = 'Error';
-        thumbnailStrip.innerHTML = `<div class="error">${error.message}</div>`;
+        itemTitle.textContent = 'Item not found';
+        thumbnailStrip.innerHTML = `<div class="error">Could not load item "${currentItem}". Please check the identifier and try again.</div>`;
+        document.getElementById('osd-container').innerHTML = '';
+        toggleThumbs.style.display = 'none';
       }
     }
 
     searchForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      loadItem(itemInput.value);
+      const item = itemInput.value;
+      const url = new URL(window.location);
+      url.searchParams.set('itemid', item);
+      window.history.pushState({}, '', url);
+      loadItem(item);
     });
 
     toggleThumbs.addEventListener('click', () => {
@@ -369,7 +382,10 @@
       toggleThumbs.textContent = thumbsCollapsed ? '▲' : '▼';
     });
 
-    loadItem(itemInput.value);
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemId = urlParams.get('itemid') || itemInput.value;
+    itemInput.value = itemId;
+    loadItem(itemId);
   </script>
 </body>
 </html>
