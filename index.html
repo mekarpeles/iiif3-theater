@@ -109,22 +109,30 @@
       overflow: hidden;
     }
 
+    .thumbnail-strip.collapsed {
+      max-height: 0;
+      padding: 0 24px;
+      overflow: hidden;
+    }
+
     .toggle-thumbs {
       position: absolute;
       bottom: 160px;
-      right: 24px;
-      width: 32px;
-      height: 32px;
-      background: #3a3a3a;
-      border: 1px solid #4a4a4a;
-      border-radius: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48px;
+      height: 20px;
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #aaa;
-      font-size: 18px;
-      transition: bottom 0.3s ease;
+      color: #666;
+      font-size: 12px;
+      transition: bottom 0.3s ease, background 0.2s ease;
       z-index: 10;
     }
 
@@ -133,7 +141,8 @@
     }
 
     .toggle-thumbs:hover {
-      background: #4a4a4a;
+      background: #3a3a3a;
+      color: #999;
     }
 
     .thumbnail-strip::-webkit-scrollbar {
