@@ -306,6 +306,12 @@
         zoomPerScroll: 2,
         timeout: 120000,
       });
+
+      viewer.addHandler('open', () => {
+        const controls = viewer.controls[0].container;
+        controls.style.top = "15px";
+        controls.style.left = "15px";
+      });
     }
 
     function renderThumbnails() {
