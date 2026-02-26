@@ -16,21 +16,30 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #1a1a1a;
       color: #fff;
-      min-height: 100vh;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
 
     .header {
-      padding: 16px 24px;
+      padding: 12px 24px;
       background: #2a2a2a;
       display: flex;
       align-items: center;
       gap: 16px;
       border-bottom: 1px solid #3a3a3a;
+      flex-shrink: 0;
     }
 
     .header h1 {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 600;
+    }
+
+    .item-title {
+      color: #aaa;
+      font-size: 14px;
     }
 
     .search-form {
@@ -40,13 +49,13 @@
     }
 
     .search-form input {
-      padding: 8px 12px;
+      padding: 6px 10px;
       border: 1px solid #4a4a4a;
       border-radius: 4px;
       background: #3a3a3a;
       color: #fff;
-      font-size: 14px;
-      width: 280px;
+      font-size: 13px;
+      width: 240px;
     }
 
     .search-form input:focus {
@@ -55,45 +64,80 @@
     }
 
     .search-form button {
-      padding: 8px 16px;
+      padding: 6px 12px;
       background: #4a90d9;
       color: #fff;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .search-form button:hover {
       background: #5a9fe9;
     }
 
-    #theater-view {
-      display: flex;
-      flex-direction: column;
-      height: calc(100vh - 65px);
+    #osd-container {
+      flex: 1;
+      background: #000;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
     }
 
-    .theater-title {
-      padding: 12px 24px;
-      font-size: 1rem;
-      color: #aaa;
-      background: #222;
+    #osd-container .openseadragon-canvas {
+      outline: none;
     }
 
     .thumbnail-strip {
-      flex: 1;
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 24px;
+      gap: 12px;
+      padding: 12px 24px;
       overflow-x: auto;
       overflow-y: hidden;
-      background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
+      background: #222;
+      border-top: 1px solid #3a3a3a;
+      flex-shrink: 0;
+      max-height: 160px;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+
+    .thumbnail-strip.collapsed {
+      max-height: 0;
+      padding: 0 24px;
+      overflow: hidden;
+    }
+
+    .toggle-thumbs {
+      position: absolute;
+      bottom: 160px;
+      right: 24px;
+      width: 32px;
+      height: 32px;
+      background: #3a3a3a;
+      border: 1px solid #4a4a4a;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 18px;
+      transition: bottom 0.3s ease;
+      z-index: 10;
+    }
+
+    .toggle-thumbs.collapsed {
+      bottom: 0;
+    }
+
+    .toggle-thumbs:hover {
+      background: #4a4a4a;
     }
 
     .thumbnail-strip::-webkit-scrollbar {
-      height: 8px;
+      height: 6px;
     }
 
     .thumbnail-strip::-webkit-scrollbar-track {
@@ -102,77 +146,43 @@
 
     .thumbnail-strip::-webkit-scrollbar-thumb {
       background: #4a4a4a;
-      border-radius: 4px;
+      border-radius: 3px;
     }
 
     .thumbnail {
       flex-shrink: 0;
-      width: 200px;
+      width: 140px;
       cursor: pointer;
-      border-radius: 8px;
+      border-radius: 6px;
       overflow: hidden;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
       background: #2a2a2a;
+      border: 2px solid transparent;
+    }
+
+    .thumbnail.active {
+      border-color: #4a90d9;
     }
 
     .thumbnail:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transform: scale(1.03);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
     .thumbnail img {
       width: 100%;
-      height: 150px;
+      height: 100px;
       object-fit: cover;
       display: block;
     }
 
     .thumbnail-info {
-      padding: 8px;
-      font-size: 12px;
-      color: #aaa;
+      padding: 6px 8px;
+      font-size: 11px;
+      color: #999;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-
-    #viewer-view {
-      display: none;
-      flex-direction: column;
-      height: calc(100vh - 65px);
-    }
-
-    .viewer-toolbar {
-      padding: 12px 24px;
-      background: #2a2a2a;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      border-bottom: 1px solid #3a3a3a;
-    }
-
-    .back-button {
-      padding: 8px 16px;
-      background: #4a4a4a;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .back-button:hover {
-      background: #5a5a5a;
-    }
-
-    .current-image {
-      color: #aaa;
-      font-size: 14px;
-    }
-
-    #osd-container {
-      flex: 1;
-      background: #000;
     }
 
     .loading, .error, .empty {
@@ -180,8 +190,8 @@
       align-items: center;
       justify-content: center;
       height: 100%;
-      font-size: 16px;
-      color: #aaa;
+      font-size: 14px;
+      color: #888;
     }
 
     .error {
@@ -190,70 +200,55 @@
 
     .loading::after {
       content: '';
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       border: 3px solid #4a4a4a;
       border-top-color: #4a90d9;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin-left: 12px;
+      margin-left: 10px;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
-    }
-
-    .hidden {
-      display: none !important;
     }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>IIIF Theater</h1>
+    <span class="item-title" id="item-title"></span>
     <form class="search-form" id="search-form">
-      <input type="text" id="item-input" placeholder="Enter archive.org item identifier" value="2025-highland-house-walkthrough-ma">
+      <input type="text" id="item-input" placeholder="archive.org item" value="2025-highland-house-walkthrough-ma">
       <button type="submit">Load</button>
     </form>
   </div>
 
-  <div id="theater-view">
-    <div class="theater-title" id="theater-title">Select an item to view</div>
-    <div class="thumbnail-strip" id="thumbnail-strip">
-      <div class="empty">Enter an archive.org item identifier above to load images</div>
-    </div>
+  <div id="osd-container">
+    <div class="loading">Loading</div>
   </div>
 
-  <div id="viewer-view">
-    <div class="viewer-toolbar">
-      <button class="back-button" id="back-button">← Back to Theater</button>
-      <span class="current-image" id="current-image"></span>
-    </div>
-    <div id="osd-container"></div>
-  </div>
+  <button class="toggle-thumbs" id="toggle-thumbs" title="Toggle thumbnails">▼</button>
+
+  <div class="thumbnail-strip" id="thumbnail-strip"></div>
 
   <script>
     const ARCHIVE_API = 'https://archive.org';
-    const IIIF_BASE = 'https://iiif.archive.org';
     const IIIF_IMAGE_BASE = 'https://iiif.archive.org/image/iiif/3';
 
     let viewer = null;
     let currentItem = '';
+    let images = [];
 
     const searchForm = document.getElementById('search-form');
     const itemInput = document.getElementById('item-input');
-    const theaterView = document.getElementById('theater-view');
-    const viewerView = document.getElementById('viewer-view');
+    const itemTitle = document.getElementById('item-title');
     const thumbnailStrip = document.getElementById('thumbnail-strip');
-    const theaterTitle = document.getElementById('theater-title');
-    const currentImage = document.getElementById('current-image');
-    const backButton = document.getElementById('back-button');
+    const toggleThumbs = document.getElementById('toggle-thumbs');
+    let thumbsCollapsed = false;
 
     function buildIIIFUrl(item, filename) {
-      if (filename) {
-        return `${IIIF_IMAGE_BASE}/${encodeURIComponent(item)}%2f${encodeURIComponent(filename)}/info.json`;
-      }
-      return `${IIIF_BASE}/iiif/img-${item}/info.json`;
+      return `${IIIF_IMAGE_BASE}/${encodeURIComponent(item)}%2f${encodeURIComponent(filename)}/info.json`;
     }
 
     function getThumbnailUrl(item, filename) {
@@ -273,41 +268,20 @@
       return filterImages(data.result);
     }
 
-    function renderTheater(images) {
-      thumbnailStrip.innerHTML = '';
+    function loadImageInViewer(filename) {
+      const container = document.getElementById('osd-container');
       
-      if (images.length === 0) {
-        thumbnailStrip.innerHTML = '<div class="empty">No images found in this item</div>';
-        return;
-      }
-
-      images.forEach(file => {
-        const thumb = document.createElement('div');
-        thumb.className = 'thumbnail';
-        thumb.innerHTML = `
-          <img src="${getThumbnailUrl(currentItem, file.name)}" alt="${file.name}" loading="lazy">
-          <div class="thumbnail-info">${file.name}</div>
-        `;
-        thumb.addEventListener('click', () => openViewer(file.name));
-        thumbnailStrip.appendChild(thumb);
-      });
-    }
-
-    function showTheater() {
-      viewerView.style.display = 'none';
-      theaterView.style.display = 'flex';
       if (viewer) {
         viewer.destroy();
         viewer = null;
       }
-    }
-
-    function openViewer(filename) {
-      const iiifUrl = buildIIIFUrl(currentItem, filename);
-      currentImage.textContent = filename;
       
-      theaterView.style.display = 'none';
-      viewerView.style.display = 'flex';
+      container.innerHTML = '';
+
+      const iiifUrl = buildIIIFUrl(currentItem, filename);
+      
+      document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.thumbnail[data-filename="${CSS.escape(filename)}"]`)?.classList.add('active');
 
       viewer = OpenSeadragon({
         id: 'osd-container',
@@ -325,19 +299,45 @@
       });
     }
 
+    function renderThumbnails() {
+      thumbnailStrip.innerHTML = '';
+      
+      if (images.length === 0) {
+        thumbnailStrip.innerHTML = '<div class="empty">No images found</div>';
+        return;
+      }
+
+      images.forEach((file, index) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'thumbnail' + (index === 0 ? ' active' : '');
+        thumb.dataset.filename = file.name;
+        thumb.innerHTML = `
+          <img src="${getThumbnailUrl(currentItem, file.name)}" alt="${file.name}" loading="lazy">
+          <div class="thumbnail-info">${file.name}</div>
+        `;
+        thumb.addEventListener('click', () => loadImageInViewer(file.name));
+        thumbnailStrip.appendChild(thumb);
+      });
+    }
+
     async function loadItem(item) {
       if (!item.trim()) return;
       
       currentItem = item.trim();
-      theaterTitle.textContent = `Loading ${currentItem}...`;
+      itemTitle.textContent = `Loading ${currentItem}...`;
       thumbnailStrip.innerHTML = '<div class="loading">Loading</div>';
+      document.getElementById('osd-container').innerHTML = '<div class="loading">Loading</div>';
 
       try {
-        const images = await fetchImages(currentItem);
-        theaterTitle.textContent = `${currentItem} (${images.length} images)`;
-        renderTheater(images);
+        images = await fetchImages(currentItem);
+        itemTitle.textContent = `${currentItem} (${images.length} images)`;
+        renderThumbnails();
+        
+        if (images.length > 0) {
+          loadImageInViewer(images[0].name);
+        }
       } catch (error) {
-        theaterTitle.textContent = 'Error';
+        itemTitle.textContent = 'Error';
         thumbnailStrip.innerHTML = `<div class="error">${error.message}</div>`;
       }
     }
@@ -347,9 +347,13 @@
       loadItem(itemInput.value);
     });
 
-    backButton.addEventListener('click', showTheater);
+    toggleThumbs.addEventListener('click', () => {
+      thumbsCollapsed = !thumbsCollapsed;
+      thumbnailStrip.classList.toggle('collapsed', thumbsCollapsed);
+      toggleThumbs.classList.toggle('collapsed', thumbsCollapsed);
+      toggleThumbs.textContent = thumbsCollapsed ? '▲' : '▼';
+    });
 
-    // Load default item on page load
     loadItem(itemInput.value);
   </script>
 </body>
